@@ -1,5 +1,5 @@
 import React from 'react';
-type AIType = 'intent' | 'churn' | 'delete' | 'subscriber';
+type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription';
 interface Options {
     /**
      * The slug of the organization
