@@ -1,0 +1,16 @@
+{
+  "name": "resubscribe-react-sdk",
+  "version": "1.0.0",
+  "description": "Resubscribe React SDK",
+  "main": "lib/index.js",
+  "repository": "git@github.com:resubscribe/resubscribe-react-sdk.git",
+  "author": "Cameron Napoli <cameron@resubscribe.ai",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1"
+  }
+}
