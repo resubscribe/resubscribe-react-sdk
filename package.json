@@ -7,10 +7,15 @@
   "author": "Cameron Napoli <cameron@resubscribe.ai",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
-    "react": "^18.3.1"
+    "react": "^18.3.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@types/react": "^18.3.1"
+    "@types/react": "^18.3.1",
+    "typescript": "^5.4.5"
   }
 }
