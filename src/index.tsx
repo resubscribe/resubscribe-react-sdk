@@ -4,7 +4,7 @@ import { create } from 'zustand';
 const base = 'https://app.resubscribe.ai';
 const domain = 'app.resubscribe.ai';
 
-type AIType = 'intent' | 'churn' | 'delete' | 'subscriber';
+type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription';
 
 type State = 'closed' | 'confirming' | 'open';
 const useStore = create<{
