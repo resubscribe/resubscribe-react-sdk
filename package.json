@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Resubscribe React SDK",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "repository": "git@github.com:resubscribe/resubscribe-react-sdk.git",
   "author": "Cameron Napoli <cameron@resubscribe.ai",
   "license": "MIT",
