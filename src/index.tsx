@@ -131,6 +131,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
       height="100%"
       style={{
         border: 'none',
+        display: 'block',
       }}
     />
   )
@@ -171,19 +172,27 @@ const ResubscribeComponent: React.FunctionComponent = () => {
           <h1 style={titleStyle}>
             {title || getTitle(aiType)}
           </h1>
-          <h2 style={descriptionStyle}>
+          <p style={descriptionStyle}>
             {description || getDescription(aiType)}
-          </h2>
-          <button onClick={() => {
-            useStore.setState({ state: 'open' });
-          }}>
-            {primaryButtonText || 'Let\'s chat!'}
-          </button>
-          <button onClick={() => {
-            useStore.setState({ state: 'closed' });
-          }}>
-            {cancelButtonText || 'Not right now'}
-          </button>
+          </p>
+          <div style={buttonsStyle}>
+            <button
+              onClick={() => {
+                useStore.setState({ state: 'open' });
+              }}
+              style={primaryButtonStyle}
+            >
+              {primaryButtonText || 'Let\'s chat!'}
+            </button>
+            <button
+              onClick={() => {
+                useStore.setState({ state: 'closed' });
+              }}
+              style={secondaryButtonStyle}
+            >
+              {cancelButtonText || 'Not right now'}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -222,12 +231,37 @@ const confirmationStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontSize: 24,
-  marginBottom: 20,
+  marginBottom: 16,
 };
 
 const descriptionStyle: React.CSSProperties = {
   fontSize: 16,
-  marginBottom: 20,
+  marginBottom: 24,
+};
+
+const buttonsStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '1rem',
+};
+
+const primaryButtonStyle: React.CSSProperties = {
+  padding: '12px 20px',
+  backgroundColor: '#0070f3',
+  color: 'white',
+  fontSize: 16,
+  border: 'none',
+  borderRadius: 8,
+  cursor: 'pointer',
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  padding: '12px 20px',
+  backgroundColor: '#eee',
+  color: 'inherit',
+  fontSize: 16,
+  border: 'none',
+  borderRadius: 8,
+  cursor: 'pointer',
 };
 
 const experienceStyle: React.CSSProperties = {
