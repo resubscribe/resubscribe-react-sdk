@@ -51,6 +51,13 @@ interface Options {
    * Callback when the component is closed.
    */
   onClose?: () => void;
+  /**
+   * Style overrides.
+   */
+  styles?: {
+    backdrop?: React.CSSProperties;
+    conversationModal?: React.CSSProperties;
+  };
 }
 
 /**
@@ -163,11 +170,15 @@ const ResubscribeComponent: React.FunctionComponent = () => {
     description,
     primaryButtonText,
     cancelButtonText,
+    styles,
   } = options;
 
   if (state === 'confirming') {
     return (
-      <div style={backdropStyle}>
+      <div style={{
+        ...backdropStyle,
+        ...(styles?.backdrop || {}),
+      }}>
         <div style={confirmationStyle}>
           <h1 style={titleStyle}>
             {title || getTitle(aiType)}
@@ -199,8 +210,14 @@ const ResubscribeComponent: React.FunctionComponent = () => {
   }
 
   return (
-    <div style={backdropStyle}>
-      <div style={experienceStyle}>
+    <div style={{
+      ...backdropStyle,
+      ...(styles?.backdrop || {}),
+    }}>
+      <div style={{
+        ...conversationStyle,
+        ...(styles?.conversationModal || {}),
+      }}>
         <WebView options={options} />
       </div>
     </div>
@@ -224,6 +241,8 @@ const confirmationStyle: React.CSSProperties = {
   backgroundColor: 'white',
   flex: 1,
   maxWidth: 400,
+  marginLeft: 16,
+  marginRight: 16,
   padding: 40,
   borderRadius: 8,
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
@@ -264,21 +283,36 @@ const secondaryButtonStyle: React.CSSProperties = {
   cursor: 'pointer',
 };
 
-const experienceStyle: React.CSSProperties = {
+const conversationStyle: React.CSSProperties = {
   backgroundColor: 'white',
   flex: 1,
   maxWidth: 600,
+  marginLeft: 16,
+  marginRight: 16,
   height: '80vh',
   borderRadius: 8,
   overflow: 'hidden',
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
 };
 
+/**
+ * Open the consent dialog and then start the conversation.
+ */
 const openConsent = (options: Options) => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
   }
   useStore.setState({ state: 'confirming', options });
+};
+
+/**
+ * Open the conversation dialog (make sure to ask for consent first).
+ */
+const openConversation = (options: Options) => {
+  if (!mounted) {
+    console.error('ResubscribeComponent is not mounted');
+  }
+  useStore.setState({ state: 'open', options });
 };
 
 const close = () => {
@@ -292,5 +326,6 @@ const close = () => {
 export default {
   Component: ResubscribeComponent,
   openConsent,
+  openConversation,
   close
 }

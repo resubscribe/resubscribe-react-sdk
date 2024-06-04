@@ -33,10 +33,18 @@ interface Options {
      * Callback when the component is closed.
      */
     onClose?: () => void;
+    /**
+     * Style overrides.
+     */
+    styles?: {
+        backdrop?: React.CSSProperties;
+        conversationModal?: React.CSSProperties;
+    };
 }
 declare const _default: {
     Component: React.FunctionComponent<{}>;
     openConsent: (options: Options) => void;
+    openConversation: (options: Options) => void;
     close: () => void;
 };
 export default _default;
