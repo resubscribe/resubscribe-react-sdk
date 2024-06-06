@@ -62,19 +62,19 @@ interface Options {
    */
   userId: string;
   /**
-   * Title override.
+   * Override for the title in the dialog.
    */
   title?: string;
   /**
-   * Description override.
+   * Override for the description in the dialog.
    */
   description?: string;
   /**
-   * The button text to use for the primary action.
+   * Override for the primary button text in the dialog.
    */
   primaryButtonText?: string;
   /**
-   * The button text to use for the secondary action.
+   * Override for the cancel button text in the dialog.
    */
   cancelButtonText?: string;
   /**
@@ -131,9 +131,9 @@ const Button = styled('div')`
   flex: 1;
   text-align: center;
   padding: 0.5rem 0.75rem;
-  background-color: ${(props: any) => props.backgroundColor || '#000'};
+  background-color: ${(props: any) => props.bgcolor || '#000'};
   color: ${(props: any) => props.color || '#fff'};
-  ${props => props.secondaryColor ? `
+  ${props => props.secondarycolor ? `
     border-width: 1px;
     border-style: solid;
     border-color: ${reduceOpacity(props.secondaryColor, 0.3) || '#d4d7de'};
@@ -176,7 +176,7 @@ const modalAnimation = `
 const DialogModalComponent = styled('div')`
   padding: 1.25rem;
   max-width: 28rem;
-  background-color: ${(props: any) => props.backgroundColor || 'white'};
+  background-color: ${(props: any) => props.bgcolor || 'white'};
   color: ${(props: any) => props.color || '#111827'};
 
   @media (min-width: 576px) {
@@ -193,7 +193,7 @@ const DialogModal: React.FunctionComponent<{
 }) => {
   return (
     <DialogModalComponent
-      backgroundColor={backgroundColor}
+      bgcolor={backgroundColor}
       color={color}
       style={{
         ...modalSharedStyle,
@@ -267,10 +267,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
         try {
           const data = JSON.parse(event.data);
           if (data.type === 'close') {
-            useStore.setState({ state: 'closed' });
-            if (options.onClose) {
-              options.onClose();
-            }
+            close();
           }
         } catch (e) {
           console.error('Failed to parse data: ', e);
@@ -322,10 +319,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
           if (!confirm('Are you sure you want to close the chat?')) {
             return;
           }
-          useStore.setState({ state: 'closed' });
-          if (options.onClose) {
-            options.onClose();
-          }
+          close();
         }}
       >
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
@@ -412,13 +406,13 @@ const ResubscribeComponent: React.FunctionComponent = () => {
           <div className={cx(buttonsClass)}>
             <Button
               onClick={() => {
-                useStore.setState({ state: 'closed' });
+                close();
               }}
               role="button"
               tabIndex={0}
-              backgroundColor="transparent"
+              bgcolor="transparent"
               color={colors?.text}
-              secondaryColor={colors?.text}
+              secondarycolor={colors?.text}
             >
               {cancelButtonText || 'Not right now'}
             </Button>
@@ -426,7 +420,7 @@ const ResubscribeComponent: React.FunctionComponent = () => {
               onClick={() => {
                 useStore.setState({ state: 'open' });
               }}
-              backgroundColor={colors?.primary}
+              bgcolor={colors?.primary}
               color={isDark ? colors?.text : colors?.background}
               role="button"
               tabIndex={0}
@@ -471,6 +465,7 @@ const modalSharedStyle: React.CSSProperties = {
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
 };
 
+let onClose: (() => void) | null = null;
 /**
  * Open the consent dialog and then start the conversation.
  */
@@ -478,7 +473,15 @@ const openWithConsent = (options: Options) => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
   }
+  if (useStore.getState().state !== 'closed') {
+    console.warn('ResubscribeComponent is already open');
+    return;
+  }
+
   useStore.setState({ state: 'confirming', options });
+  if (options.onClose) {
+    onClose = options.onClose;
+  }
 };
 
 const close = () => {
@@ -486,6 +489,10 @@ const close = () => {
     console.error('ResubscribeComponent is not mounted');
   }
   useStore.setState({ state: 'closed', options: null });
+  if (onClose) {
+    onClose();
+    onClose = null;
+  }
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export

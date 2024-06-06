@@ -20,19 +20,19 @@ interface Options {
      */
     userId: string;
     /**
-     * Title override.
+     * Override for the title in the dialog.
      */
     title?: string;
     /**
-     * Description override.
+     * Override for the description in the dialog.
      */
     description?: string;
     /**
-     * The button text to use for the primary action.
+     * Override for the primary button text in the dialog.
      */
     primaryButtonText?: string;
     /**
-     * The button text to use for the secondary action.
+     * Override for the cancel button text in the dialog.
      */
     cancelButtonText?: string;
     /**
