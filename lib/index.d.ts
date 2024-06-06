@@ -1,5 +1,10 @@
 import React from 'react';
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription';
+interface Colors {
+    primary: string;
+    text: string;
+    background: string;
+}
 interface Options {
     /**
      * The slug of the organization
@@ -34,17 +39,13 @@ interface Options {
      */
     onClose?: () => void;
     /**
-     * Style overrides.
+     * Color settings.
      */
-    styles?: {
-        backdrop?: React.CSSProperties;
-        conversationModal?: React.CSSProperties;
-    };
+    colors?: Colors;
 }
 declare const _default: {
     Component: React.FunctionComponent<{}>;
-    openConsent: (options: Options) => void;
-    openConversation: (options: Options) => void;
+    openWithConsent: (options: Options) => void;
     close: () => void;
 };
 export default _default;
