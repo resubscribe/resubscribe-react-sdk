@@ -120,7 +120,7 @@ const Button = styled('div')`
   padding: 0.5rem 0.75rem;
   background-color: ${(props: any) => props.backgroundColor || '#000'};
   color: ${(props: any) => props.color || '#fff'};
-  ${(props: any) => props.secondaryColor ? `
+  ${props => props.secondaryColor ? `
     border-width: 1px;
     border-style: solid;
     border-color: ${reduceOpacity(props.secondaryColor, 0.3) || '#d4d7de'};
@@ -196,6 +196,7 @@ const ChatModalComponent = styled('div')`
   height: 80vh;
   max-width: 600px;
   background-color: ${(props: any) => props.backgroundColor || 'white'};
+  position: relative;
 `;
 const ChatModal: React.FunctionComponent<{
   backgroundColor?: string;
@@ -274,21 +275,51 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
       'ait': options.aiType,
       'uid': options.userId,
       'iframe': 'true',
+      'hideclose': 'true',
     };
     const ret = `${base}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&')}`;
     return ret;
   }, [options]);
 
   return (
-    <iframe
-      src={url}
-      width="100%"
-      height="100%"
-      style={{
-        border: 'none',
-        display: 'block',
-      }}
-    />
+    <>
+      <iframe
+        src={url}
+        width="100%"
+        height="100%"
+        style={{
+          border: 'none',
+          display: 'block',
+        }}
+      />
+      {/* Close button */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 16,
+          right: 10,
+          height: 32,
+          width: 32,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          cursor: 'pointer',
+        }}
+        onClick={() => {
+          if (!confirm('Are you sure you want to close the chat?')) {
+            return;
+          }
+          useStore.setState({ state: 'closed' });
+          if (options.onClose) {
+            options.onClose();
+          }
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+        </svg>
+      </div>
+    </>
   )
 };
 
