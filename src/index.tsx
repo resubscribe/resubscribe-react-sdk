@@ -3,6 +3,14 @@ import { css, styled, setup, keyframes } from 'goober';
 import { create } from 'zustand';
 import Color from 'color';
 
+export const getNavigatorLanguage = (): string | null => {
+  if (navigator.languages && navigator.languages.length) {
+    return navigator.languages[0];
+  } else {
+    return (navigator as any).userLanguage || navigator.language || (navigator as any).browserLanguage || null;
+  }
+};
+
 const reduceOpacity = (color: string, opacity: number) => {
   return Color(color).alpha(opacity).string();
 }
@@ -15,7 +23,8 @@ const cx = (...classes: Array<string | null | undefined>) => classes.filter(Bool
 
 setup(React.createElement);
 
-const base = 'https://app.resubscribe.ai';
+const baseUrl = 'https://app.resubscribe.ai';
+const apiUrl = 'https://api.resubscribe.ai';
 const domain = 'app.resubscribe.ai';
 
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
@@ -281,7 +290,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
       'iframe': 'true',
       'hideclose': 'true',
     };
-    const ret = `${base}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&')}`;
+    const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&')}`;
     return ret;
   }, [options]);
 
@@ -337,6 +346,35 @@ const ResubscribeComponent: React.FunctionComponent = () => {
       mounted = false;
     };
   }, []);
+
+  const fetched = React.useRef(false);
+  useEffect(() => {
+    if (!options || fetched.current) {
+      return;
+    }
+    if (state === 'confirming') {
+      fetched.current = true;
+      const params = {
+        slug: options.slug,
+        uid: options.userId,
+        ait: options.aiType,
+        brloc: getNavigatorLanguage(),
+      }
+      const url = `${apiUrl}/v1/sessions/consent?${Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&')}`;
+      fetch(
+        url,
+        {
+          cache: 'no-cache',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          }
+        },
+      ).catch((e) => {
+        console.error('Failed to fetch consent: ', e);
+      });
+    }
+  }, [options, state]);
 
   if (state === 'closed') {
     return null;

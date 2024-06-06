@@ -1,4 +1,5 @@
 import React from 'react';
+export declare const getNavigatorLanguage: () => string | null;
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 interface Colors {
     primary: string;
