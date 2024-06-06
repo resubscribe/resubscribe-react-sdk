@@ -12,10 +12,13 @@
     "build": "tsc"
   },
   "dependencies": {
+    "color": "^4.2.3",
+    "goober": "^2.1.14",
     "react": "^18.3.1",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@types/color": "^3.0.6",
     "@types/react": "^18.3.1",
     "typescript": "^5.4.5"
   }

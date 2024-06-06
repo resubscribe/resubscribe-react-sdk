@@ -1,5 +1,19 @@
 import React, { useEffect, useMemo } from 'react';
+import { css, styled, setup, keyframes } from 'goober';
 import { create } from 'zustand';
+import Color from 'color';
+
+const reduceOpacity = (color: string, opacity: number) => {
+  return Color(color).alpha(opacity).string();
+}
+
+const isDarkColor = (color: string) => {
+  return Color(color).isDark();
+};
+
+const cx = (...classes: Array<string | null | undefined>) => classes.filter(Boolean).join(' ');
+
+setup(React.createElement);
 
 const base = 'https://app.resubscribe.ai';
 const domain = 'app.resubscribe.ai';
@@ -18,6 +32,13 @@ const useStore = create<{
   openConsent: (options: Options) => set({ state: 'confirming', options }),
   close: () => set({ state: 'closed', options: null }),
 }));
+
+interface Colors {
+  primary: string;
+  text: string;
+  background: string;
+}
+
 interface Options {
   /**
    * The slug of the organization
@@ -52,12 +73,9 @@ interface Options {
    */
   onClose?: () => void;
   /**
-   * Style overrides.
+   * Color settings.
    */
-  styles?: {
-    backdrop?: React.CSSProperties;
-    conversationModal?: React.CSSProperties;
-  };
+  colors?: Colors;
 }
 
 /**
@@ -73,6 +91,8 @@ const getTitle = (aiType: AIType) => {
       return 'We\'re sorry to see you go';
     case 'subscriber':
       return 'Would you like to tell us about your experience?';
+    case 'presubscription':
+      return 'Can we ask you a few questions?';
   }
 };
 
@@ -89,8 +109,136 @@ const getDescription = (aiType: AIType) => {
       return 'Can we ask you a few questions? It should only take a few minutes.';
     case 'subscriber':
       return 'Can we ask you a few questions? It should only take a few minutes.';
+    case 'presubscription':
+      return 'Can we ask you a few questions? It should only take a few minutes.';
   }
 }
+
+const Button = styled('div')`
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 0.75rem;
+  background-color: ${(props: any) => props.backgroundColor || '#000'};
+  color: ${(props: any) => props.color || '#fff'};
+  ${(props: any) => props.secondaryColor ? `
+    border-width: 1px;
+    border-style: solid;
+    border-color: ${reduceOpacity(props.secondaryColor, 0.3) || '#d4d7de'};
+  ` : `
+    border: none;
+  `}
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+`
+
+const containerAnimation = `
+0% {opacity:.5;}
+100% {opacity:1;}
+`;
+const Container: React.FunctionComponent<{
+  isDark: boolean;
+} & React.PropsWithChildren> = ({
+  isDark,
+  children,
+}) => {
+  return (
+    <div
+      style={{
+        ...containerStyle,
+        backgroundColor: !isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)',
+        animation: `${keyframes(containerAnimation)} 150ms ease-in-out forwards`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const modalAnimation = `
+0% {transform: translateY(-4px); opacity:.5;}
+100% {transform: translateY(0px); opacity:1;}
+`;
+const DialogModalComponent = styled('div')`
+  padding: 1.25rem;
+  max-width: 28rem;
+  background-color: ${(props: any) => props.backgroundColor || 'white'};
+  color: ${(props: any) => props.color || '#111827'};
+
+  @media (min-width: 576px) {
+    padding: 1.5rem;
+  }
+`;
+const DialogModal: React.FunctionComponent<{
+  backgroundColor?: string;
+  color?: string;
+} & React.PropsWithChildren> = ({
+  backgroundColor,
+  color,
+  children,
+}) => {
+  return (
+    <DialogModalComponent
+      backgroundColor={backgroundColor}
+      color={color}
+      style={{
+        ...modalSharedStyle,
+        animation: `${keyframes(modalAnimation)} 150ms ease-in-out forwards`,
+      }}
+    >
+      {children}
+    </DialogModalComponent>
+  );
+};
+
+const ChatModalComponent = styled('div')`
+  height: 80vh;
+  max-width: 600px;
+  background-color: ${(props: any) => props.backgroundColor || 'white'};
+`;
+const ChatModal: React.FunctionComponent<{
+  backgroundColor?: string;
+} & React.PropsWithChildren> = ({
+  backgroundColor,
+  children,
+}) => {
+  return (
+    <ChatModalComponent
+      backgroundColor={backgroundColor}
+      style={{
+        ...modalSharedStyle,
+        animation: `${keyframes(modalAnimation)} 150ms ease-in-out forwards`,
+      }}
+    >
+      {children}
+    </ChatModalComponent>
+  );
+};
+
+const titleClass = css`
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+`;
+
+const descriptionClass = css`
+  margin-top: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  opacity: 0.8;
+`;
+
+const buttonsClass = css`
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  @media (min-width: 576px) {
+    flex-direction: row;
+  }
+`;
 
 interface WebViewProps {
   options: Options;
@@ -170,126 +318,81 @@ const ResubscribeComponent: React.FunctionComponent = () => {
     description,
     primaryButtonText,
     cancelButtonText,
-    styles,
+    colors,
   } = options;
+
+  const isDark = !colors?.background ? false : isDarkColor(colors.background);
 
   if (state === 'confirming') {
     return (
-      <div style={{
-        ...backdropStyle,
-        ...(styles?.backdrop || {}),
-      }}>
-        <div style={confirmationStyle}>
-          <h1 style={titleStyle}>
+      <Container isDark={isDark}>
+        <DialogModal
+          backgroundColor={colors?.background}
+          color={colors?.text}
+        >
+          <div className={cx(titleClass)}>
             {title || getTitle(aiType)}
-          </h1>
-          <p style={descriptionStyle}>
+          </div>
+          <div className={cx(descriptionClass)}>
             {description || getDescription(aiType)}
-          </p>
-          <div style={buttonsStyle}>
-            <button
-              onClick={() => {
-                useStore.setState({ state: 'open' });
-              }}
-              style={primaryButtonStyle}
-            >
-              {primaryButtonText || 'Let\'s chat!'}
-            </button>
-            <button
+          </div>
+          <div className={cx(buttonsClass)}>
+            <Button
               onClick={() => {
                 useStore.setState({ state: 'closed' });
               }}
-              style={secondaryButtonStyle}
+              role="button"
+              tabIndex={0}
+              backgroundColor="transparent"
+              color={colors?.text}
+              secondaryColor={colors?.text}
             >
               {cancelButtonText || 'Not right now'}
-            </button>
+            </Button>
+            <Button
+              onClick={() => {
+                useStore.setState({ state: 'open' });
+              }}
+              backgroundColor={colors?.primary}
+              color={isDark ? colors?.text : colors?.background}
+              role="button"
+              tabIndex={0}
+            >
+              {primaryButtonText || 'Let\'s chat!'}
+            </Button>
           </div>
-        </div>
-      </div>
+        </DialogModal>
+      </Container>
     );
   }
 
   return (
-    <div style={{
-      ...backdropStyle,
-      ...(styles?.backdrop || {}),
-    }}>
-      <div style={{
-        ...conversationStyle,
-        ...(styles?.conversationModal || {}),
-      }}>
+    <Container isDark={isDark}>
+      <ChatModal
+        backgroundColor={colors?.background}
+      >
         <WebView options={options} />
-      </div>
-    </div>
+      </ChatModal>
+    </Container>
   );
 };
 
-const backdropStyle: React.CSSProperties = {
+const containerStyle: React.CSSProperties = {
   position: 'fixed',
   zIndex: 9999,
   top: 0,
   left: 0,
   width: '100%',
   height: '100%',
-  backgroundColor: 'rgba(0, 0, 0, 0.2)',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
 }
 
-const confirmationStyle: React.CSSProperties = {
-  backgroundColor: 'white',
+const modalSharedStyle: React.CSSProperties = {
   flex: 1,
-  maxWidth: 400,
-  marginLeft: 16,
-  marginRight: 16,
-  padding: 40,
-  borderRadius: 8,
-  boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: 24,
-  marginBottom: 16,
-};
-
-const descriptionStyle: React.CSSProperties = {
-  fontSize: 16,
-  marginBottom: 24,
-};
-
-const buttonsStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '1rem',
-};
-
-const primaryButtonStyle: React.CSSProperties = {
-  padding: '12px 20px',
-  backgroundColor: '#0070f3',
-  color: 'white',
-  fontSize: 16,
-  border: 'none',
-  borderRadius: 8,
-  cursor: 'pointer',
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-  padding: '12px 20px',
-  backgroundColor: '#eee',
-  color: 'inherit',
-  fontSize: 16,
-  border: 'none',
-  borderRadius: 8,
-  cursor: 'pointer',
-};
-
-const conversationStyle: React.CSSProperties = {
-  backgroundColor: 'white',
-  flex: 1,
-  maxWidth: 600,
-  marginLeft: 16,
-  marginRight: 16,
-  height: '80vh',
+  marginLeft: 4,
+  marginRight: 4,
   borderRadius: 8,
   overflow: 'hidden',
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
@@ -298,21 +401,11 @@ const conversationStyle: React.CSSProperties = {
 /**
  * Open the consent dialog and then start the conversation.
  */
-const openConsent = (options: Options) => {
+const openWithConsent = (options: Options) => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
   }
   useStore.setState({ state: 'confirming', options });
-};
-
-/**
- * Open the conversation dialog (make sure to ask for consent first).
- */
-const openConversation = (options: Options) => {
-  if (!mounted) {
-    console.error('ResubscribeComponent is not mounted');
-  }
-  useStore.setState({ state: 'open', options });
 };
 
 const close = () => {
@@ -325,7 +418,6 @@ const close = () => {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   Component: ResubscribeComponent,
-  openConsent,
-  openConversation,
-  close
+  openWithConsent,
+  close,
 }
