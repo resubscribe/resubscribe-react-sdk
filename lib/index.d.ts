@@ -1,5 +1,5 @@
 import React from 'react';
-type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription';
+type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 interface Colors {
     primary: string;
     text: string;

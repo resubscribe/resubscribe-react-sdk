@@ -18,7 +18,7 @@ setup(React.createElement);
 const base = 'https://app.resubscribe.ai';
 const domain = 'app.resubscribe.ai';
 
-type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription';
+type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 
 type State = 'closed' | 'confirming' | 'open';
 const useStore = create<{
@@ -93,6 +93,8 @@ const getTitle = (aiType: AIType) => {
       return 'Would you like to tell us about your experience?';
     case 'presubscription':
       return 'Can we ask you a few questions?';
+    case 'precancel':
+      return 'Can we ask you a few questions?';
   }
 };
 
@@ -110,7 +112,9 @@ const getDescription = (aiType: AIType) => {
     case 'subscriber':
       return 'Can we ask you a few questions? It should only take a few minutes.';
     case 'presubscription':
-      return 'Can we ask you a few questions? It should only take a few minutes.';
+      return 'We\'d love to hear your thoughts. It should only take a few minutes.';
+    case 'precancel':
+      return 'We\'d love to hear your thoughts. It should only take a few minutes.';
   }
 }
 
