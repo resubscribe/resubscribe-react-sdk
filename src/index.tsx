@@ -7,6 +7,8 @@ setup(React.createElement);
 
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 
+type CloseFn = (via: 'cancel-consent' | 'close') => void;
+
 type State = 'closed' | 'confirming' | 'open';
 const useStore = create<{
   state: State;
@@ -56,9 +58,9 @@ interface Options {
    */
   cancelButtonText?: string;
   /**
-   * Callback when the component is closed.
+   * Callback when the component is closed. Use the via parameter to identify how the modal was closed.
    */
-  onClose?: () => void;
+  onClose?: CloseFn;
   /**
    * Color settings.
    */
@@ -186,7 +188,7 @@ const DialogModal: React.FunctionComponent<{
 const ChatModalComponent = styled('div')`
   height: 80vh;
   max-width: 600px;
-  background-color: ${(props: any) => props.backgroundColor || 'white'};
+  background-color: ${(props: any) => props.bgcolor || 'white'};
   position: relative;
 `;
 const ChatModal: React.FunctionComponent<{
@@ -197,7 +199,7 @@ const ChatModal: React.FunctionComponent<{
 }) => {
   return (
     <ChatModalComponent
-      backgroundColor={backgroundColor}
+      bgcolor={backgroundColor}
       style={{
         ...modalSharedStyle,
         animation: `${keyframes(modalAnimation)} 150ms ease-in-out forwards`,
@@ -245,7 +247,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
         try {
           const data = JSON.parse(event.data);
           if (data.type === 'close') {
-            close();
+            close('close');
           }
         } catch (e) {
           console.error('Failed to parse data: ', e);
@@ -297,7 +299,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
           if (!confirm('Are you sure you want to close the chat?')) {
             return;
           }
-          close();
+          close('close');
         }}
       >
         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
@@ -384,7 +386,7 @@ const ResubscribeComponent: React.FunctionComponent = () => {
           <div className={cx(buttonsClass)}>
             <Button
               onClick={() => {
-                close();
+                close('cancel-consent');
               }}
               role="button"
               tabIndex={0}
@@ -443,7 +445,7 @@ const modalSharedStyle: React.CSSProperties = {
   boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
 };
 
-let onClose: (() => void) | null = null;
+let onClose: CloseFn | null = null;
 /**
  * Open the consent dialog and then start the conversation.
  */
@@ -462,13 +464,13 @@ const openWithConsent = (options: Options) => {
   }
 };
 
-const close = () => {
+const close = (via: 'cancel-consent' | 'close') => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
   }
   useStore.setState({ state: 'closed', options: null });
   if (onClose) {
-    onClose();
+    onClose(via);
     onClose = null;
   }
 };

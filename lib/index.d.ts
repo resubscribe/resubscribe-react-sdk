@@ -1,5 +1,6 @@
 import React from 'react';
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
+type CloseFn = (via: 'cancel-consent' | 'close') => void;
 interface Colors {
     primary: string;
     text: string;
@@ -35,9 +36,9 @@ interface Options {
      */
     cancelButtonText?: string;
     /**
-     * Callback when the component is closed.
+     * Callback when the component is closed. Use the via parameter to identify how the modal was closed.
      */
-    onClose?: () => void;
+    onClose?: CloseFn;
     /**
      * Color settings.
      */
@@ -46,6 +47,6 @@ interface Options {
 declare const _default: {
     Component: React.FunctionComponent<{}>;
     openWithConsent: (options: Options) => void;
-    close: () => void;
+    close: (via: "close" | "cancel-consent") => void;
 };
 export default _default;
