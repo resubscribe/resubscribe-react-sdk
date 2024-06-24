@@ -20,7 +20,9 @@ export default function Home() {
         background: '#eee',
         text: '#333',
       },
-      // onClose: () => {},
+      onClose: (via) => {
+        //
+      },
     });
   };
 
