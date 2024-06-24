@@ -1,5 +1,7 @@
 # Resubscribe React SDK
 
+![NPM Version](https://img.shields.io/npm/v/resubscribe-react-sdk)
+
 The official React SDK for [Resubscribe](https://resubscribe.ai).
 
 ## Instructions
