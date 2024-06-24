@@ -1,6 +1,6 @@
 {
   "name": "resubscribe-react-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Resubscribe React SDK",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
