@@ -1,9 +1,7 @@
 {
   "name": "resubscribe-react-sdk",
-  "version": "1.0.2",
+  "version": "1.0.2-beta.0",
   "description": "Resubscribe React SDK",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "keywords": [
     "resubscribe",
     "churn",
@@ -17,18 +15,28 @@
   "author": "Cameron Napoli <cameron@resubscribe.ai",
   "license": "MIT",
   "private": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {
     "color": "^4.2.3",
-    "goober": "^2.1.14",
-    "react": "^18.3.1",
+    "goober": "^2.1.10",
     "zustand": "^4.5.2"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
   },
   "devDependencies": {
     "@types/color": "^3.0.6",
     "@types/react": "^18.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.4.5"
   }
 }

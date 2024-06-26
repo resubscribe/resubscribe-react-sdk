@@ -4,7 +4,9 @@
     "lib": ["es2019", "dom"],
     "module": "commonjs",
     "declaration": true,
-    "outDir": "./lib",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "outDir": "./dist",
     "strict": true,
     "jsx": "react",
     "esModuleInterop": true
