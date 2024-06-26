@@ -1,4 +1,5 @@
 import React from 'react';
+
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 type CloseFn = (via: 'cancel-consent' | 'close') => void;
 interface Colors {
@@ -47,6 +48,7 @@ interface Options {
 declare const _default: {
     Component: React.FunctionComponent<{}>;
     openWithConsent: (options: Options) => void;
-    close: (via: "close" | "cancel-consent") => void;
+    close: (via: "cancel-consent" | "close") => void;
 };
-export default _default;
+
+export { _default as default };

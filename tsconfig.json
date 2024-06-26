@@ -1,16 +1,20 @@
 {
+  "include": ["src"],
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es2019", "dom"],
-    "module": "commonjs",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
     "declaration": true,
     "sourceMap": true,
-    "moduleResolution": "node",
-    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": true,
+    "moduleResolution": "node",
     "jsx": "react",
-    "esModuleInterop": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+  }
 }
