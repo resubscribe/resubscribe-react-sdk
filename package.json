@@ -1,6 +1,6 @@
 {
   "name": "resubscribe-react-sdk",
-  "version": "1.0.2-beta.0",
+  "version": "1.0.3",
   "description": "Resubscribe React SDK",
   "keywords": [
     "resubscribe",
@@ -17,8 +17,20 @@
   "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsup"
   },
   "engines": {
     "node": ">=14"
@@ -37,6 +49,7 @@
     "@types/react": "^18.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tsup": "^6.7.0",
     "typescript": "^5.4.5"
   }
 }
