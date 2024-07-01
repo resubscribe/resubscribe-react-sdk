@@ -4,7 +4,7 @@
 
 The official React SDK for [Resubscribe](https://resubscribe.ai).
 
-## Instructions
+## Setup
 
 Mount the component and then trigger the Resubscribe modal with the `openWithConsent` method. Replace the placeholders with your own values.
 
@@ -35,3 +35,43 @@ export default function Home() {
     </main>
   )
 }
+```
+
+## Headless
+
+You can alternatively use the headless version of the SDK.
+
+```typescript
+import Resubscribe, { ResubscribeOptions } from 'resubscribe-react-sdk';
+
+export default function Home() {
+  const onOpenConsent = async () => {
+    Resubscribe.headless.setOptions({
+      slug: '{organization-slug}',
+      aiType: '{ai-type}',
+      userId: '{uid}',
+    });
+    Resubscribe.headless.registerConsentRequest();
+    // Open your own consent modal here 👇
+    const confirmed = await confirm(...);
+
+    if (confirmed) {
+      Resubscribe.headless.openChat({
+        onClose: (via: any) => {
+          console.log('onClose', via);
+        },
+        classNames: {
+          overlay: styles.overlay,
+        },
+      });
+    }
+  };
+
+  return (
+    <main>
+      ...
+      <Resubscribe.Component />
+    </main>
+  )
+}
+```

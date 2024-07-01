@@ -2,12 +2,13 @@ import React from 'react';
 
 type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
 type CloseFn = (via: 'cancel-consent' | 'close') => void;
-interface Colors {
+
+interface ResubscribeColors {
     primary: string;
     text: string;
     background: string;
 }
-interface Options {
+interface ResubscribeOptions {
     /**
      * The slug of the organization
      */
@@ -43,12 +44,24 @@ interface Options {
     /**
      * Color settings.
      */
-    colors?: Colors;
+    colors?: ResubscribeColors;
+    /**
+     * Class name customizations.
+     */
+    classNames?: {
+        overlay?: string;
+        modal?: string;
+    };
 }
 declare const _default: {
     Component: React.FunctionComponent<{}>;
-    openWithConsent: (options: Options) => void;
-    close: (via: "cancel-consent" | "close") => void;
+    openWithConsent: (options: ResubscribeOptions) => void;
+    close: (via: "close" | "cancel-consent") => void;
+    headless: {
+        setOptions: (options: ResubscribeOptions) => void;
+        openChat: (partialOptions?: Partial<ResubscribeOptions> | undefined) => void;
+        registerConsentRequest: () => void;
+    };
 };
 
-export { _default as default };
+export { ResubscribeOptions, _default as default };

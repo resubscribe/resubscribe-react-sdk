@@ -1,34 +1,32 @@
 import React, { useEffect, useMemo } from 'react';
-import { css, styled, setup, keyframes } from 'goober';
+import { setup } from 'goober';
 import { create } from 'zustand';
-import { apiUrl, baseUrl, cx, domain, getNavigatorLanguage, isDarkColor, reduceOpacity } from './util';
+import {
+  AIType, CloseFn, State, api, baseUrl, cx, domain, getDescription, getNavigatorLanguage, getTitle, isDarkColor,
+} from './util';
+import { Backdrop, Button, DialogModal, ChatModal, globalClasses } from './components';
 
 setup(React.createElement);
 
-type AIType = 'intent' | 'churn' | 'delete' | 'subscriber' | 'presubscription' | 'precancel';
-
-type CloseFn = (via: 'cancel-consent' | 'close') => void;
-
-type State = 'closed' | 'confirming' | 'open';
 const useStore = create<{
   state: State;
-  options: Options | null;
-  openConsent: (options: Options) => void;
+  options: ResubscribeOptions | null;
+  openConsent: (options: ResubscribeOptions) => void;
   close: () => void;
 }>((set) => ({
   state: 'closed' as State,
-  options: null as Options | null,
-  openConsent: (options: Options) => set({ state: 'confirming', options }),
+  options: null as ResubscribeOptions | null,
+  openConsent: (options: ResubscribeOptions) => set({ state: 'confirming', options }),
   close: () => set({ state: 'closed', options: null }),
 }));
 
-interface Colors {
+interface ResubscribeColors {
   primary: string;
   text: string;
   background: string;
 }
 
-interface Options {
+export interface ResubscribeOptions {
   /**
    * The slug of the organization
    */
@@ -64,178 +62,33 @@ interface Options {
   /**
    * Color settings.
    */
-  colors?: Colors;
-}
-
-/**
- * Get default titles for each AI type.
- */
-const getTitle = (aiType: AIType) => {
-  switch (aiType) {
-    case 'intent':
-      return 'Not ready to pay?';
-    case 'churn':
-      return 'We\'re sorry to see you go';
-    case 'delete':
-      return 'We\'re sorry to see you go';
-    case 'subscriber':
-      return 'Would you like to tell us about your experience?';
-    case 'presubscription':
-      return 'Can we ask you a few questions?';
-    case 'precancel':
-      return 'Can we ask you a few questions?';
-  }
-};
-
-/**
- * Get default descriptions for each AI type.
- */
-const getDescription = (aiType: AIType) => {
-  switch (aiType) {
-    case 'intent':
-      return 'Can we ask you a few questions? It should only take a few minutes.';
-    case 'churn':
-      return 'Can we ask you a few questions? It should only take a few minutes.';
-    case 'delete':
-      return 'Can we ask you a few questions? It should only take a few minutes.';
-    case 'subscriber':
-      return 'Can we ask you a few questions? It should only take a few minutes.';
-    case 'presubscription':
-      return 'We\'d love to hear your thoughts. It should only take a few minutes.';
-    case 'precancel':
-      return 'We\'d love to hear your thoughts. It should only take a few minutes.';
+  colors?: ResubscribeColors;
+  /**
+   * Class name customizations.
+   */
+  classNames?: {
+    overlay?: string;
+    modal?: string;
   }
 }
 
-const Button = styled('div')`
-  flex: 1;
-  text-align: center;
-  padding: 0.5rem 0.75rem;
-  background-color: ${(props: any) => props.bgcolor || '#000'};
-  color: ${(props: any) => props.color || '#fff'};
-  ${props => props.secondarycolor ? `
-    border-width: 1px;
-    border-style: solid;
-    border-color: ${reduceOpacity(props.secondaryColor, 0.3) || '#d4d7de'};
-  ` : `
-    border: none;
-  `}
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-`
-
-const containerAnimation = `
-0% {opacity:.5;}
-100% {opacity:1;}
-`;
-const Container: React.FunctionComponent<{
-  isDark: boolean;
-} & React.PropsWithChildren> = ({
-  isDark,
-  children,
-}) => {
-  return (
-    <div
-      style={{
-        ...containerStyle,
-        backgroundColor: !isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-        animation: `${keyframes(containerAnimation)} 150ms ease-in-out forwards`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const modalAnimation = `
-0% {transform: translateY(-4px); opacity:.5;}
-100% {transform: translateY(0px); opacity:1;}
-`;
-const DialogModalComponent = styled('div')`
-  padding: 1.25rem;
-  max-width: 28rem;
-  background-color: ${(props: any) => props.bgcolor || 'white'};
-  color: ${(props: any) => props.color || '#111827'};
-
-  @media (min-width: 576px) {
-    padding: 1.5rem;
+const registerConsent = (options: ResubscribeOptions) => {
+  const params: Record<string, any> = {
+    slug: options.slug,
+    uid: options.userId,
+    ait: options.aiType,
+    brloc: getNavigatorLanguage(),
   }
-`;
-const DialogModal: React.FunctionComponent<{
-  backgroundColor?: string;
-  color?: string;
-} & React.PropsWithChildren> = ({
-  backgroundColor,
-  color,
-  children,
-}) => {
-  return (
-    <DialogModalComponent
-      bgcolor={backgroundColor}
-      color={color}
-      style={{
-        ...modalSharedStyle,
-        animation: `${keyframes(modalAnimation)} 150ms ease-in-out forwards`,
-      }}
-    >
-      {children}
-    </DialogModalComponent>
-  );
+  api.get(
+    'sessions/consent',
+    params,
+  ).catch((e) => {
+    console.error('Failed to fetch sessions/consent: ', e);
+  });
 };
-
-const ChatModalComponent = styled('div')`
-  height: 80vh;
-  max-width: 600px;
-  background-color: ${(props: any) => props.bgcolor || 'white'};
-  position: relative;
-`;
-const ChatModal: React.FunctionComponent<{
-  backgroundColor?: string;
-} & React.PropsWithChildren> = ({
-  backgroundColor,
-  children,
-}) => {
-  return (
-    <ChatModalComponent
-      bgcolor={backgroundColor}
-      style={{
-        ...modalSharedStyle,
-        animation: `${keyframes(modalAnimation)} 150ms ease-in-out forwards`,
-      }}
-    >
-      {children}
-    </ChatModalComponent>
-  );
-};
-
-const titleClass = css`
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-align: center;
-`;
-
-const descriptionClass = css`
-  margin-top: 1rem;
-  font-size: 1rem;
-  text-align: center;
-  opacity: 0.8;
-`;
-
-const buttonsClass = css`
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-
-  @media (min-width: 576px) {
-    flex-direction: row;
-  }
-`;
 
 interface WebViewProps {
-  options: Options;
+  options: ResubscribeOptions;
 }
 const WebView: React.FunctionComponent<WebViewProps> = ({
   options,
@@ -327,26 +180,7 @@ const ResubscribeComponent: React.FunctionComponent = () => {
       return;
     }
     if (state === 'confirming') {
-      fetched.current = true;
-      const params = {
-        slug: options.slug,
-        uid: options.userId,
-        ait: options.aiType,
-        brloc: getNavigatorLanguage(),
-      }
-      const url = `${apiUrl}/v1/sessions/consent?${Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&')}`;
-      fetch(
-        url,
-        {
-          cache: 'no-cache',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          }
-        },
-      ).catch((e) => {
-        console.error('Failed to fetch consent: ', e);
-      });
+      registerConsent(options);
     }
   }, [options, state]);
 
@@ -366,24 +200,26 @@ const ResubscribeComponent: React.FunctionComponent = () => {
     primaryButtonText,
     cancelButtonText,
     colors,
+    classNames,
   } = options;
 
   const isDark = !colors?.background ? false : isDarkColor(colors.background);
 
   if (state === 'confirming') {
     return (
-      <Container isDark={isDark}>
+      <Backdrop isDark={isDark} className={classNames?.overlay}>
         <DialogModal
           backgroundColor={colors?.background}
           color={colors?.text}
+          className={classNames?.modal}
         >
-          <div className={cx(titleClass)}>
+          <div className={cx(globalClasses.title)}>
             {title || getTitle(aiType)}
           </div>
-          <div className={cx(descriptionClass)}>
+          <div className={cx(globalClasses.description)}>
             {description || getDescription(aiType)}
           </div>
-          <div className={cx(buttonsClass)}>
+          <div className={cx(globalClasses.buttons)}>
             <Button
               onClick={() => {
                 close('cancel-consent');
@@ -409,47 +245,30 @@ const ResubscribeComponent: React.FunctionComponent = () => {
             </Button>
           </div>
         </DialogModal>
-      </Container>
+      </Backdrop>
     );
   }
 
   return (
-    <Container isDark={isDark}>
+    <Backdrop
+      isDark={isDark}
+      className={classNames?.overlay}
+    >
       <ChatModal
         backgroundColor={colors?.background}
+        className={classNames?.modal}
       >
         <WebView options={options} />
       </ChatModal>
-    </Container>
+    </Backdrop>
   );
-};
-
-const containerStyle: React.CSSProperties = {
-  position: 'fixed',
-  zIndex: 9999,
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-}
-
-const modalSharedStyle: React.CSSProperties = {
-  flex: 1,
-  marginLeft: 4,
-  marginRight: 4,
-  borderRadius: 8,
-  overflow: 'hidden',
-  boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
 };
 
 let onClose: CloseFn | null = null;
 /**
  * Open the consent dialog and then start the conversation.
  */
-const openWithConsent = (options: Options) => {
+const openWithConsent = (options: ResubscribeOptions) => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
   }
@@ -464,6 +283,9 @@ const openWithConsent = (options: Options) => {
   }
 };
 
+/**
+ * Close the dialog and start the conversation.
+ */
 const close = (via: 'cancel-consent' | 'close') => {
   if (!mounted) {
     console.error('ResubscribeComponent is not mounted');
@@ -475,9 +297,64 @@ const close = (via: 'cancel-consent' | 'close') => {
   }
 };
 
+/**
+ * Set the options for the component.
+ */
+let headlessOptions: ResubscribeOptions | null = null;
+const setOptions = (options: ResubscribeOptions) => {
+  headlessOptions = options;
+};
+
+/**
+ * Open the dialog without the consent dialog.
+ */
+const openChat = (partialOptions?: Partial<ResubscribeOptions>) => {
+  if (!headlessOptions) {
+    console.error('No headless options set');
+    return;
+  }
+  
+  if (!mounted) {
+    console.error('ResubscribeComponent is not mounted');
+  }
+  if (useStore.getState().state !== 'closed') {
+    console.warn('ResubscribeComponent is already open');
+    return;
+  }
+
+  const merged = {
+    ...headlessOptions,
+    ...partialOptions,
+  };
+
+  useStore.setState({
+    state: 'open',
+    options: merged,
+  });
+  if (merged.onClose) {
+    onClose = merged.onClose;
+  }
+};
+
+/**
+ * Register a consent request.
+ */
+const registerConsentRequest = () => {
+  if (!headlessOptions) {
+    console.error('No headless options set');
+    return;
+  }
+  registerConsent(headlessOptions);
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   Component: ResubscribeComponent,
   openWithConsent,
   close,
+  headless: {
+    setOptions,
+    openChat,
+    registerConsentRequest,
+  },
 }
