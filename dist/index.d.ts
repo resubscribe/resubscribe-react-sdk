@@ -22,6 +22,10 @@ interface ResubscribeOptions {
      */
     userId: string;
     /**
+     * The user's email for logging and support follow-up.
+     */
+    userEmail?: string;
+    /**
      * Override for the title in the dialog.
      */
     title?: string;

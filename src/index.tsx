@@ -40,6 +40,10 @@ export interface ResubscribeOptions {
    */
   userId: string;
   /**
+   * The user's email for logging and support follow-up.
+   */
+  userEmail?: string;
+  /**
    * Override for the title in the dialog.
    */
   title?: string;
@@ -76,6 +80,7 @@ const registerConsent = (options: ResubscribeOptions) => {
   const params: Record<string, any> = {
     slug: options.slug,
     uid: options.userId,
+    email: options.userEmail,
     ait: options.aiType,
     brloc: getNavigatorLanguage(),
   }
@@ -117,10 +122,11 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
     const queryParams = {
       'ait': options.aiType,
       'uid': options.userId,
+      'email': options.userEmail,
       'iframe': 'true',
       'hideclose': 'true',
     };
-    const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value || ''}`).join('&')}`;
+    const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).filter(([_, value]) => value !== undefined).map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`).join('&')}`;
     return ret;
   }, [options]);
 
