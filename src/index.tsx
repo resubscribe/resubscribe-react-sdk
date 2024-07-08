@@ -120,7 +120,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
       'iframe': 'true',
       'hideclose': 'true',
     };
-    const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&')}`;
+    const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).map(([key, value]) => `${key}=${value || ''}`).join('&')}`;
     return ret;
   }, [options]);
 
