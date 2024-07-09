@@ -8,7 +8,7 @@ export const api = {
   get: async (path: string, params: Record<string, string | null | undefined>) => {
     const query = Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&');
     const url = `${apiUrl}/v1/${path}?${query}`;
-    await fetch(
+    const response = await fetch(
       url,
       {
         cache: 'no-cache',
@@ -18,6 +18,10 @@ export const api = {
         }
       },
     );
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${url}`);
+    }
+    return response.json();
   },
 }
 
