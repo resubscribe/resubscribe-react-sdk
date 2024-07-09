@@ -15,8 +15,9 @@ export default function Home() {
   const onTrigger = () => {
     Resubscribe.openWithConsent({
       slug: '{organization-slug}',
-      aiType: '{ai-type}>',
+      aiType: '{ai-type}',
       userId: '{uid}',
+      userEmail: '{optionalEmail}',
       colors: {
         primary: 'blue',
         background: '#eee',
@@ -50,6 +51,7 @@ export default function Home() {
       slug: '{organization-slug}',
       aiType: '{ai-type}',
       userId: '{uid}',
+      userEmail: '{optionalEmail}',
     });
     Resubscribe.headless.registerConsentRequest();
     // Open your own consent modal here 👇
