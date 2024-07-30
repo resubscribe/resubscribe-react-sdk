@@ -6,7 +6,14 @@ export const domain = 'app.resubscribe.ai';
 
 export const api = {
   get: async (path: string, params: Record<string, string | null | undefined>) => {
-    const query = Object.entries(params).map(([key, value]) => `${key}=${value}`).join('&');
+    const filtered: Record<string, string> = {};
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        filtered[key] = value;
+      }
+    });
+
+    const query = Object.entries(filtered).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
     const url = `${apiUrl}/v1/${path}?${query}`;
     const response = await fetch(
       url,
