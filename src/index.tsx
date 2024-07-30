@@ -233,8 +233,8 @@ const ResubscribeComponent: React.FunctionComponent = () => {
               role="button"
               tabIndex={0}
               bgcolor="transparent"
-              color={colors?.text}
-              secondarycolor={colors?.text}
+              color={colors?.text || '#000'}
+              secondarycolor={colors?.text || '#000'}
             >
               {cancelButtonText || 'Not right now'}
             </Button>
