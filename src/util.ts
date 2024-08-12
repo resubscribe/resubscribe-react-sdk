@@ -5,7 +5,7 @@ export const apiUrl = 'https://api.resubscribe.ai';
 export const domain = 'app.resubscribe.ai';
 
 export const api = {
-  get: async (path: string, params: Record<string, string | null | undefined>) => {
+  get: async (path: string, params: Record<string, string | null | undefined>, apiKey : string | undefined) => {
     const filtered: Record<string, string> = {};
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
@@ -22,6 +22,7 @@ export const api = {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          ...(apiKey ? {'Authorization': 'Bearer ' + apiKey} : {}),
         }
       },
     );

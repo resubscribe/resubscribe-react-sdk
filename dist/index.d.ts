@@ -14,6 +14,10 @@ interface ResubscribeOptions {
      */
     slug: string;
     /**
+     * The API key for accessing Resubscribe
+     */
+    apiKey: string;
+    /**
      * The type of AI to use.
      */
     aiType: AIType;

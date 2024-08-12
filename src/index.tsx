@@ -32,6 +32,10 @@ export interface ResubscribeOptions {
    */
   slug: string;
   /**
+   * The API key for accessing Resubscribe
+   */
+  apiKey: string;
+  /**
    * The type of AI to use.
    */
   aiType: AIType;
@@ -87,6 +91,7 @@ const registerConsent = (options: ResubscribeOptions) => {
   api.get(
     'sessions/consent',
     params,
+    options.apiKey
   ).catch((e) => {
     console.error('Failed to fetch sessions/consent: ', e);
   });
@@ -127,7 +132,7 @@ const WebView: React.FunctionComponent<WebViewProps> = ({
       'hideclose': 'true',
     };
     const ret = `${baseUrl}/chat/${options.slug}?${Object.entries(queryParams).filter(([_, value]) => value !== undefined).map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`).join('&')}`;
-    return ret;
+    return ret + (options.apiKey ? "#apiKey=" + options.apiKey : "");
   }, [options]);
 
   return (
