@@ -24,7 +24,7 @@ import n,{useEffect as $,useMemo as V}from"react";import{setup as Y}from"goober"
   backdrop-filter: blur(5px);
   animation: ${P} 150ms ease-in-out forwards;
 
-  position: 'fixed';
+  position: fixed;
   z-index: 9999;
   top: 0;
   left: 0;
