@@ -24,7 +24,7 @@
   backdrop-filter: blur(5px);
   animation: ${G} 150ms ease-in-out forwards;
 
-  position: 'fixed';
+  position: fixed;
   z-index: 9999;
   top: 0;
   left: 0;
