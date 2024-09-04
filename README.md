@@ -6,6 +6,14 @@ The official React SDK for [Resubscribe](https://resubscribe.ai).
 
 ## Setup
 
+### Install
+
+```bash
+npm install resubscribe-react-sdk
+```
+
+### Usage
+
 Mount the component and then trigger the Resubscribe modal with the `openWithConsent` method. Replace the placeholders with your own values.
 
 ```typescript
